@@ -82,7 +82,7 @@ def auth_required(func):
 @auth_required
 def index():
     #user_id in session ;TO CHECK COOKIE
-    return redirect(url_for('login'))
+    return render_template('index.html')
 
 @app.route('/profile')
 @auth_required

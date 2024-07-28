@@ -6,12 +6,22 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
+          {% if 'user_id' in session %}
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('login')}}">LOGIN</a> <!-- present one is not hardcoded just fetching link for the fucntion ie def login<a class="nav-link" href="/login">LOGIN</a>-->
+            <a class="nav-link" href="{{ url_for('index') }}">HOME</a> 
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('register')}}">REGISTER</a>
+            <a class="nav-link" href="{{ url_for('profile')}}">PROFILE</a> 
           </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('login')}}">LOGIN</a> <!-- present one is not hardcoded just fetching link for the fucntion ie def login<a class="nav-link" href="/login">LOGIN</a>-->
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('register')}}">REGISTER</a>
+            </li>
+          {% endif %}
+
 
         </ul>
       </div>
