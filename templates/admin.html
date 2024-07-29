@@ -27,6 +27,10 @@
                 <td>{{category.id}}</td>
                 <td>{{category.name}}</td>
                 <td>
+                    <a href="{{url_for('show_category',id=category.id)}}" class="btn btn-primary">
+                        <i class="fas fa-search"></i> <!-- category.id -->
+                        Show
+                    </a>
                     <a href="{{url_for('edit_category',id=category.id)}}" class="btn btn-primary">
                         <i class="fas fa-edit"></i> <!-- category.id -->
                         Edit
