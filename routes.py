@@ -1,8 +1,9 @@
 from flask import render_template,request,redirect,url_for,flash,session
 from app import app
-from models import User,db,Category
+from models import User,db,Category,Product,Order
 from werkzeug.security import generate_password_hash,check_password_hash
 from functools import wraps
+from datetime import datetime
 
          
 
@@ -198,7 +199,11 @@ def add_category_post():
 @app.route('/category/<int:id>')
 @admin_required
 def show_category(id):
-    return "Show Category"
+    category=Category.query.get(id)
+    if not category:
+        flash('Category does not exist')
+        return redirect(url_for('admin'))
+    return render_template('category/show.html',category=category)
 
 @app.route('/category/<int:id>/edit')
 @admin_required
@@ -243,6 +248,133 @@ def delete_category_post(id): #got from id=category.id
         return redirect(url_for('admin'))
     db.session.delete(category)
     db.session.commit()
-    
+
     flash('Category deleted successfully')
     return redirect(url_for('admin'))
+
+
+@app.route('/product/add/<int:category_id>')
+@admin_required
+def add_product(category_id):
+    categories = Category.query.all()
+    category = Category.query.get(category_id)
+    if not category:
+        flash('Category does not exist')
+        return redirect(url_for('admin'))
+    now = datetime.now().strftime('%Y-%m-%d')
+    return render_template('product/add.html', category=category, categories=categories, now=now)
+
+@app.route('/product/add/', methods=['POST'])
+@admin_required
+def add_product_post():
+    name = request.form.get('name')
+    price = request.form.get('price')
+    category_id = request.form.get('category_id')
+    quantity = request.form.get('quantity')
+    man_date = request.form.get('man_date')
+
+    category = Category.query.get(category_id)
+    if not category:
+        flash('Category does not exist')
+        return redirect(url_for('admin'))
+
+    if not name or not price or not quantity or not man_date:
+        flash('Please fill out all fields')
+        return redirect(url_for('add_product', category_id=category_id))
+    try:
+        quantity = int(quantity)
+        price = float(price)
+        man_date = datetime.strptime(man_date, '%Y-%m-%d')
+    except ValueError:
+        flash('Invalid quantity or price')
+        return redirect(url_for('add_product', category_id=category_id))
+
+    if price <= 0 or quantity <= 0:
+        flash('Invalid quantity or price')
+        return redirect(url_for('add_product', category_id=category_id))
+    
+    if man_date > datetime.now():
+        flash('Invalid manufacturing date')
+        return redirect(url_for('add_product', category_id=category_id))
+
+    product = Product(name=name, price=price, category=category, quantity=quantity, man_date=man_date)
+    db.session.add(product)
+    db.session.commit()
+
+    flash('Product added successfully')
+    return redirect(url_for('show_category', id=category_id))
+
+@app.route('/product/<int:id>/edit')
+@admin_required
+def edit_product(id):
+    categories = Category.query.all()
+    product = Product.query.get(id)
+    return render_template('product/edit.html',product=product ,categories=categories)
+
+@app.route('/product/<int:id>/edit',methods=['POST'])
+@admin_required
+def edit_product_post(id):
+    name = request.form.get('name')
+    price = request.form.get('price')
+    category_id = request.form.get('category_id')
+    quantity = request.form.get('quantity')
+    man_date = request.form.get('man_date')
+
+    category = Category.query.get(category_id)
+    if not category:
+        flash('Category does not exist')
+        return redirect(url_for('admin'))
+
+    if not name or not price or not quantity or not man_date:
+        flash('Please fill out all fields')
+        return redirect(url_for('add_product', category_id=category_id))
+    try:
+        quantity = int(quantity)
+        price = float(price)
+        man_date = datetime.strptime(man_date, '%Y-%m-%d')
+    except ValueError:
+        flash('Invalid quantity or price')
+        return redirect(url_for('add_product', category_id=category_id))
+
+    if price <= 0 or quantity <= 0:
+        flash('Invalid quantity or price')
+        return redirect(url_for('add_product', category_id=category_id))
+    
+    if man_date > datetime.now():
+        flash('Invalid manufacturing date')
+        return redirect(url_for('add_product', category_id=category_id))
+
+    product =  Product.query.get(id)
+    product.name=name
+    product.price=price
+    product.category=category
+    product.quantity=quantity
+    product.man_date=man_date
+
+    db.session.commit()
+
+    flash('Product edited successfully')
+    return redirect(url_for('show_category', id=category_id))
+
+@app.route('/product/<int:id>/delete')
+@admin_required
+def delete_product(id):
+        product=Product.query.get(id)
+        if not product:
+            flash('Product does not exist')
+            return redirect(url_for('admin'))
+        return render_template('product/delete.html',product=product)
+
+@app.route('/product/<int:id>/delete',methods=['POST'])
+@admin_required
+def delete_product_post(id): #got from id=category.id
+    product=Product.query.get(id)
+    if not product:
+        flash('Product does not exist')
+        return redirect(url_for('admin'))
+    category_id=product.category.id
+    db.session.delete(product)
+    db.session.commit()
+
+    flash('Product deleted successfully')
+    return redirect(url_for('show_category',id=category_id))

@@ -16,17 +16,9 @@
 </head>
 <body>
     {% include 'navbar.html'   %}
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <ul class=flashes>
-        {% for message in messages %}
-        <!--<li>{{ message }}</li> -->
-        <div class="alert alert-danger" role="alert">
-            {{ message }}
-            {% endfor %}
-        </ul>
-    {% endif %}
-    {% endwith %}
+    {% include 'messages.html'   %}
+
+    
     <!--Before Child -->
     <div class="container"> <!--Container gives padding to left and right side-->
         {% block content %}
