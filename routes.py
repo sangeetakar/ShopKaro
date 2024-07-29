@@ -78,10 +78,27 @@ def auth_required(func):
             return redirect(url_for('login'))
     return inner
 
+def admin_required(func):
+    @wraps(func) #so that auth function has different name for the / and profile respectivly
+    def inner(*args,**kwargs):
+        if 'user_id' not in session:
+            flash('Login to continue')
+            return redirect(url_for('login'))
+        user=User.query.get(session['user_id'])
+        if not user.is_admin:
+            flash('You are not authorized to view this page')
+            return redirect(url_for('index'))
+        return func(*args,**kwargs)
+    return inner
+
+
 @app.route('/')
 @auth_required
 def index():
     #user_id in session ;TO CHECK COOKIE
+    user=User.query.get(session['user_id'])
+    if user.is_admin:
+        return redirect(url_for('admin'))
     return render_template('index.html')
 
 @app.route('/profile')
@@ -150,3 +167,27 @@ def logout():
     flash('Logged out successfully')
     return redirect(url_for('login'))
 
+@app.route('/admin')
+@admin_required
+def admin():
+    return render_template('admin.html')
+
+@app.route('/category/add')
+@admin_required
+def add_category():
+    return "add category"
+
+@app.route('/category/<int:id>')
+@admin_required
+def show_category(id):
+    return "Show Category"
+
+@app.route('/category/<int:id>/edit')
+@admin_required
+def edit_category(id):
+    return "Edit Category"
+
+@app.route('/category/<int:id>/delete')
+@admin_required
+def delete_category(id): #got from id=category.id
+    return "Delete Category"
