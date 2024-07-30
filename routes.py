@@ -246,6 +246,11 @@ def delete_category_post(id): #got from id=category.id
     if not category:
         flash('Category does not exist')
         return redirect(url_for('admin'))
+    #if we try to delete a category which has products in it it throws an error
+    #so we need to delete the products first
+    # products=category.products
+    # for product in products:
+    #     db.session.delete(product)
     db.session.delete(category)
     db.session.commit()
 
@@ -309,7 +314,8 @@ def add_product_post():
 def edit_product(id):
     categories = Category.query.all()
     product = Product.query.get(id)
-    return render_template('product/edit.html',product=product ,categories=categories)
+    now = datetime.now().strftime('%Y-%m-%d')
+    return render_template('product/edit.html',product=product ,categories=categories,now=now)
 
 @app.route('/product/<int:id>/edit',methods=['POST'])
 @admin_required

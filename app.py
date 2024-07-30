@@ -6,6 +6,8 @@ import config #meaning config.py
 
 import models
 
+import api
+
 import routes
 
 #orders of the import files must be same

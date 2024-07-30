@@ -16,6 +16,8 @@ class Category(db.Model):
     name = db.Column(db.String(32), unique=True)
 
     products = db.relationship('Product', backref='category', lazy=True, cascade='all, delete-orphan')
+#cascade='all, delete-orphan' means that if a category is deleted, all products under that category will also be deleted
+
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -27,6 +29,7 @@ class Product(db.Model):
 
     carts = db.relationship('Cart', backref='product', lazy=True, cascade='all, delete-orphan')
     orders = db.relationship('Order', backref='product', lazy=True, cascade='all, delete-orphan')
+    #cascade='all, delete-orphan' means that if a product is deleted, all carts and orders containing that product will also be deleted
 
 class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -40,6 +43,7 @@ class Transaction(db.Model):
     datetime = db.Column(db.DateTime, nullable=False)
 
     orders = db.relationship('Order', backref='transaction', lazy=True, cascade='all, delete-orphan')
+    #cascade='all, delete-orphan' means that if a transaction is deleted, all orders under that transaction will also be deleted
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)

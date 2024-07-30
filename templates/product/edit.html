@@ -58,6 +58,7 @@
         <label for="man_date" class="form-label">Manufacture Date:</label>
         <input type="date" name="man_date" id="man_date" required
         value="{{product.man_date}}"
+        max="{{now}}"
          class="form-control">
     </div>
     <button type="submit" class="btn btn-success">
