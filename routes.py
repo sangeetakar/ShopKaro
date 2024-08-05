@@ -1,6 +1,6 @@
 from flask import render_template,request,redirect,url_for,flash,session
 from app import app
-from models import User,db,Category,Product,Order
+from models import User,db,Category,Product,Cart   
 from werkzeug.security import generate_password_hash,check_password_hash
 from functools import wraps
 from datetime import datetime
@@ -93,14 +93,7 @@ def admin_required(func):
     return inner
 
 
-@app.route('/')
-@auth_required
-def index():
-    #user_id in session ;TO CHECK COOKIE
-    user=User.query.get(session['user_id'])
-    if user.is_admin:
-        return redirect(url_for('admin'))
-    return render_template('index.html')
+
 
 @app.route('/profile')
 @auth_required
@@ -384,3 +377,44 @@ def delete_product_post(id): #got from id=category.id
 
     flash('Product deleted successfully')
     return redirect(url_for('show_category',id=category_id))
+
+#------------------------------------------------------------------USER ROUTES------------
+@app.route('/')
+@auth_required
+def index():
+    #user_id in session ;TO CHECK COOKIE
+    user=User.query.get(session['user_id'])
+    if user.is_admin:
+        return redirect(url_for('admin'))
+    categories=Category.query.all()
+    return render_template('index.html',categories=categories)
+
+@app.route('/add_to_cart/<int:product_id>',methods=['POST'])
+@auth_required
+def add_to_cart(product_id):
+    product=Product.query.get(product_id)
+    if not product:
+        flash('Product does not exist')
+    quantity=request.form.get('quantity')
+    try:
+        quantity=int(quantity)
+    except ValueError:
+        flash('Invalid quantity')
+        return redirect(url_for('index'))
+    if quantity<=0 or quantity>product.quantity:
+        flash(f'Invalid quantity ! Should be between 1 and {product.quantity}')
+        return redirect(url_for('index'))
+    
+    cart=Cart.query.filter_by(user_id=session['user_id'],product_id=product_id).first()
+    if cart:
+        if cart.quantity+quantity>product.quantity:
+            flash(f'Invalid quantity ! Should be between 1 and {product.quantity}')
+            return redirect(url_for('index'))
+        cart.quantity+=quantity
+    else:
+        cart=Cart(user_id=session['user_id'],product_id=product_id,quantity=quantity)
+        db.session.add(cart)
+
+    db.session.commit()
+    flash('Product added to cart successfully')
+    return redirect(url_for('index'))
