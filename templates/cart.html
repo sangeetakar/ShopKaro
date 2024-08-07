@@ -1,0 +1,70 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+  Cart
+{% endblock %}
+
+{% block content %}
+  <h1 class="display-1">
+    CART
+  </h1>
+  <hr>
+  {% if carts|length>0 %}
+    
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Subtotal</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for cart in carts %}
+        <tr>
+          <td>{{ cart.product.name }}</td>
+          <td>{{ cart.quantity }}</td>
+          <td>{{ cart.product.price }}</td>
+          <td>{{ cart.product.price * cart.quantity }}</td>
+          <td>
+            <form action="{{url_for('delete_cart',id=cart.id)}}" method="post">
+            <button class="btn btn-danger">
+                <i class="fa fa-trash"></i>
+                Remove</button>
+              </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="3"><b>Total</b></td>
+            <td>
+              <strong>
+              {{ total }}
+              </strong>
+            </td>
+            <td>
+              <form action="{{url_for('checkout')}}" method="post">
+                <button class="btn btn-success">
+                    <i class="fa fa-shopping-cart"></i>
+                    Checkout</button>
+                  </form>
+            </td>
+        </tr>
+    </tfoot>
+  </table>
+  
+{% else %}
+  <div class="alert alert-warning">
+    <h3>Your cart is empty</h3>
+  </div>
+{% endif %}
+
+{% endblock %}
+
+{% block style %}
+    
+{% endblock %}

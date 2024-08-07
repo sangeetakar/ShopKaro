@@ -1,0 +1,70 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    ORDERS
+{% endblock %}
+
+{% block content %}
+<h1 class="display-1">
+    ORDERS
+</h1>
+<hr>
+{% if transactions|length>0 %}         
+    {% for transaction in transactions %}
+        <div class="heading">
+            <h3 class="text-muted">Transaction #{{transaction.id}}</h3>
+            <p class="datetime">{{ transaction.datetime.strftime("%d %b %Y, %I:%M %p") }}</p>
+        </div>
+        <div class="orders">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in transaction.orders %}
+                        <tr>
+                            <td>{{ order.product.name }}</td>
+                            <td>{{ order.quantity }}</td>
+                            <td>{{ order.price }}</td>
+                            <td>{{ order.price * order.quantity }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+
+                
+            </table>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="alert alert-info">
+        <h2> No orders found </h2>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block style %}
+    <style>
+        .heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .datetime {
+            font-size: 1.0em;
+            color: #007bff;
+        }
+    </style>
+{% endblock %}
+
+{% block script %}
+    <script>
+        // Add your custom JavaScript here
+    </script>
+    
+{% endblock %}
