@@ -29,13 +29,19 @@
                                     {{ product.man_date }}
                                 </div>
                             </p>
-                            <div class="quantity_input">
-                                <form action="{{ url_for('add_to_cart', product_id=product.id) }}" class="form" method="POST">
-                                    <label class="form-label" for="quantity">Quantity:</label>
-                                    <input class="form-control" type="number" name="quantity" id="quantity" min="1" max="{{ product.quantity }}" value="1">
-                                    <input type="submit" class="btn btn-success" value="Add To Cart">
-                                </form>
-                            </div>
+                            {% if product.quantity > 0 %}                         
+                                <div class="quantity_input">
+                                    <form action="{{ url_for('add_to_cart', product_id=product.id) }}" class="form" method="POST">
+                                        <label class="form-label" for="quantity">Quantity:</label>
+                                        <input class="form-control" type="number" name="quantity" id="quantity" min="1" max="{{ product.quantity }}" value="1">
+                                        <input type="submit" class="btn btn-success" value="Add To Cart">
+                                    </form>
+                                </div>
+                            {% else %}
+                            <button disabled="disabled" class="btn btn-danger">
+                                <i class="fas fa-times    "></i>
+                                Out of Stock</button>
+                            {% endif %}
                         </div>
                     </div>
                         {% endif %}

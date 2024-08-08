@@ -8,6 +8,14 @@
 <h1 class="display-1">
     ORDERS
 </h1>
+<button class="btn btn-primary" onClick="window.print()">
+    <i class="fas fa-print    "></i>
+    Print
+</button>
+<a href="{{url_for('export_csv')}}" class="btn btn-outline-primary">
+    <i class="fas fa-file-export    "></i>
+    Export
+</a>
 <hr>
 {% if transactions|length>0 %}         
     {% for transaction in transactions %}
